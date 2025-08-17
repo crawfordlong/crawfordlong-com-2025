@@ -1,0 +1,74 @@
+<!-- layouts/photos/single.html -->
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/css/main.css">
+<title>{{ with .Params.caption }}{{ . }} · {{ end }}{{ .Site.Title }}</title>
+{{ partial "header.html" . }}
+
+<main class="photo-page">
+  <a href="/" class="back">← Back</a>
+
+  {{/* images, sorted deterministically by filename */}}
+  {{ $imgs := sort (.Resources.ByType "image") "Name" }}
+  {{ $hero := index $imgs 0 }}
+
+  {{/* large hero without upscaling */}}
+  {{ $heroBig := $hero }}
+  {{ if $hero }}{{ if gt $hero.Width 1600 }}{{ $heroBig = $hero.Resize "1600x" }}{{ end }}{{ end }}
+
+  <figure>
+    {{ with $heroBig }}
+      <img id="hero" class="hero" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="">
+    {{ end }}
+    {{ with .Params.caption }}<figcaption>{{ . }}</figcaption>{{ end }}
+
+    {{/* EXIF line (skip nonsense f/0 etc.) */}}
+    {{ with $hero }}
+      {{ $exif := .Exif }}
+      {{ if $exif }}
+        {{ $parts := slice }}
+        {{ with $exif.Tags.Model }}{{ $parts = $parts | append . }}{{ end }}
+        {{ with $exif.Tags.LensModel }}{{ $parts = $parts | append . }}{{ end }}
+        {{ $fraw := printf "%v" $exif.Tags.FNumber }}
+        {{ $fclean := replace (lower $fraw) "f/" "" }}
+        {{ if and (ne $fclean "") (ne $fclean "<nil>") (ne $fclean "0") (ne $fclean "0/1") (ne $fclean "0.0") }}
+          {{ $parts = $parts | append (printf "f/%s" $fclean) }}
+        {{ end }}
+        {{ with $exif.Tags.ExposureTime }}{{ $parts = $parts | append . }}{{ end }}
+        {{ $iso := or $exif.Tags.ISOSpeedRatings $exif.Tags.PhotographicSensitivity }}
+        {{ with $iso }}{{ $parts = $parts | append (printf "ISO %v" .) }}{{ end }}
+        {{ $focal := or $exif.Tags.FocalLengthIn35mmFilm $exif.Tags.FocalLength }}
+        {{ with $focal }}{{ $parts = $parts | append (printf "%v" .) }}{{ end }}
+        {{ if gt (len $parts) 0 }}<div class="meta">{{ delimit $parts " · " }}</div>{{ end }}
+      {{ end }}
+    {{ end }}
+  </figure>
+
+  {{ if gt (len $imgs) 1 }}
+    <section class="filmstrip" id="filmstrip" aria-label="More photos in this post">
+      {{ range $i, $im := $imgs }}
+        {{/* thumbnails: same height (110px), keep aspect, no upscaling */}}
+        {{ $thumb := $im }}{{ if gt $im.Height 110 }}{{ $thumb = $im.Resize "x110" }}{{ end }}
+        {{/* full-size target for hero without upscaling */}}
+        {{ $full := $im }}{{ if gt $im.Width 1600 }}{{ $full = $im.Resize "1600x" }}{{ end }}
+        <a href="{{ .RelPermalink }}"
+           class="thumb{{ if eq $i 0 }} active{{ end }}"
+           data-full="{{ $full.RelPermalink }}"
+           data-w="{{ $full.Width }}"
+           data-h="{{ $full.Height }}"
+           aria-label="Show this photo">
+          <img src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" alt="">
+        </a>
+      {{ end }}
+    </section>
+  {{ end }}
+
+  {{ if .Content }}
+    <article class="story">
+      {{ .Content }}
+    </article>
+  {{ end }}
+</main>
+
+<script defer src="/js/filmstrip.js"></script>

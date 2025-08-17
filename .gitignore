@@ -1,0 +1,35 @@
+# Hugo build output
+/public/
+/resources/
+
+# Temporary local files
+.DS_Store
+Thumbs.db
+
+# OS/IDE/editor junk
+*.swp
+*.swo
+*.bak
+*.tmp
+*.log
+*.lock
+
+# VS Code
+.vscode/
+
+# Hugo server cache
+hugo_stats.json
+
+# Node (if using npm or Tailwind or whatever)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Environment/Secrets
+.env
+.env.*
+
+# Netlify/Vercel config (optional depending on usage)
+.netlify/
+.vercel/
+

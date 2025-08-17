@@ -1,0 +1,40 @@
+backend:
+  name: github
+  repo: YOURORG/YOURREPO
+  branch: main
+  base_url: https://YOUR-OAUTH-WORKER.workers.dev
+  auth_endpoint: /oauth
+
+site_url: https://YOURDOMAIN
+display_url: https://YOURDOMAIN
+
+# collections keep media next to the entry (leaf bundles)
+media_folder: "static/media"
+public_folder: "/media"
+
+collections:
+  - name: photos
+    label: Photos
+    folder: "content/photos"
+    create: true
+    path: "{{year}}/{{month}}/{{day}}/{{hour}}{{minute}}-{{slug}}/index"
+    media_folder: ""      # upload beside index.md
+    public_folder: ""
+    fields:
+      - {name: title, widget: string, required: false}
+      - {name: date,  widget: datetime}
+      - {name: caption, widget: string, required: false}
+      - {name: image, label: Cover Image (optional), widget: image, required: false}
+      - {name: body, widget: markdown, required: false}
+  - name: notes
+    label: Notes
+    folder: "content/notes"
+    create: true
+    path: "{{year}}/{{month}}/{{day}}/{{hour}}{{minute}}-{{slug}}/index"
+    media_folder: ""
+    public_folder: ""
+    fields:
+      - {name: title, widget: string, required: false}
+      - {name: date,  widget: datetime}
+      - {name: body, widget: markdown}
+

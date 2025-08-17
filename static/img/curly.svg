@@ -1,0 +1,4 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 20">
+  <path d="M0,10 C20,0 40,20 60,10 C80,0 100,20 120,10" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round"></path>
+</svg>

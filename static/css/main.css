@@ -1,0 +1,268 @@
+/*----------------------------------------------------------
+  VARIABLES & RESET
+----------------------------------------------------------*/
+:root {
+  --gap: 10px;
+  --maxw: 1200px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #111;
+}
+
+/*----------------------------------------------------------
+  LAYOUT
+----------------------------------------------------------*/
+main {
+  margin: 24px auto;
+  max-width: var(--maxw);
+  padding: 0 var(--gap);
+}
+
+.masonry {
+  column-width: 320px;
+  column-gap: var(--gap);
+}
+
+@media (max-width: 700px) {
+  .masonry {
+    column-width: 100%;
+  }
+}
+
+/*----------------------------------------------------------
+  CARD STYLES
+----------------------------------------------------------*/
+.card {
+  display: block;
+  break-inside: avoid;
+  margin: 0 0 var(--gap);
+  background: #fff;
+}
+
+.card.photo {
+  position: relative;
+}
+
+.card.photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+a.card.note {
+  aspect-ratio: 3 / 4;
+  min-height: 220px;
+  display: grid;
+  align-content: start;
+  justify-items: start;     /* optional, for left-align */
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid #eee;
+  padding: 10px;
+}
+
+a.card.note:hover {
+  background: #fafafa;
+}
+
+.card.note {
+  aspect-ratio: 3 / 4;
+  min-height: 220px;
+  display: grid;
+  align-content: start;
+}
+
+/*----------------------------------------------------------
+  COUNT BADGE (for multi-image posts)
+----------------------------------------------------------*/
+.count-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+/*----------------------------------------------------------
+  HEADER
+----------------------------------------------------------*/
+.site-header {
+  border-bottom: 1px solid #eee;
+  background: #fff;
+}
+
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 12px var(--gap);
+}
+
+.brand {
+  font-weight: 600;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand img {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #555;
+  margin-left: 16px;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}
+
+/*----------------------------------------------------------
+  HERO IMAGE
+----------------------------------------------------------*/
+.hero {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/*----------------------------------------------------------
+  TYPOGRAPHY
+----------------------------------------------------------*/
+.meta {
+  color: #777;
+  font-size: 0.9rem;
+  margin-top: 6px;
+  text-align: center;
+}
+
+figcaption {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 6px;
+  text-align: center;
+}
+
+.back {
+  display: inline-block;
+  margin: 0 0 12px;
+  text-decoration: none;
+  color: #555;
+}
+
+/*----------------------------------------------------------
+  STORY PAGES & SUBGRIDS
+----------------------------------------------------------*/
+.story {
+  max-width: 800px;
+  margin: 18px auto 0;
+}
+
+.subgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.subgrid img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/*----------------------------------------------------------
+  FILMSTRIP BELOW HERO
+----------------------------------------------------------*/
+.filmstrip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.filmstrip a.thumb {
+  display: block;
+  border-radius: 4px;
+  overflow: hidden;
+  outline: 0;
+}
+
+.filmstrip a.thumb img {
+  display: block;
+  height: 110px;
+  width: auto;
+}
+
+.filmstrip a.thumb.active {
+  outline: 2px solid #999;
+  outline-offset: 2px;
+}
+
+/*----------------------------------------------------------
+  PAGINATION & STATUS
+----------------------------------------------------------*/
+.page-load-status {
+  text-align: center;
+  margin: 28px 0 56px;
+}
+
+.fancy-last {
+  color: #777;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+}
+
+.fancy-last span {
+  position: relative;
+  display: inline-block;
+  padding: 6px 18px;
+}
+
+.fancy-last span::before,
+.fancy-last span::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 88px;
+  height: 14px;
+  opacity: 0.35;
+  background: center/contain no-repeat url("/img/curly.svg");
+}
+
+.fancy-last span::before {
+  left: -104px;
+}
+
+.fancy-last span::after {
+  right: -104px;
+}
+
+/*----------------------------------------------------------
+  LOADING MESSAGE
+----------------------------------------------------------*/
+.loading {
+  display: block;
+  text-align: center;
+  color: #777;
+  padding: 12px 0;
+}
