@@ -1,12 +1,12 @@
 backend:
   name: github
-  repo: YOURORG/YOURREPO
+  repo: crawfordlong/crawfordlong-com-2025
   branch: main
-  base_url: https://YOUR-OAUTH-WORKER.workers.dev
+  base_url: https://crawfordlong.com
   auth_endpoint: /oauth
 
-site_url: https://YOURDOMAIN
-display_url: https://YOURDOMAIN
+site_url: https://crawfordlong.com
+display_url: https://crawfordlong.com
 
 # collections keep media next to the entry (leaf bundles)
 media_folder: "static/media"
