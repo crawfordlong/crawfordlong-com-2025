@@ -34,20 +34,13 @@
         {{ $exif := . }}
         {{ $parts := slice }}
         {{ with $exif.Tags.Model }}
-          {{ $model := replaceRE "Leica M[0-9]+.*" "Leica M" . }}
+          {{ $raw := replaceRE "[[:space:]]+" " " . | trim " " }}
+          {{ $model := replaceRE "(?i)^leica m[0-9]+.*" "Leica M" $raw }}
           {{ $parts = $parts | append $model }}
-        {{ end }}
-        {{ with $exif.Tags.LensModel }}{{ $parts = $parts | append . }}{{ end }}
-        {{ $fraw := printf "%v" $exif.Tags.FNumber }}
-        {{ $fclean := replace (lower $fraw) "f/" "" }}
-        {{ if and (ne $fclean "") (ne $fclean "<nil>") (ne $fclean "0") (ne $fclean "0/1") (ne $fclean "0.0") }}
-          {{ $parts = $parts | append (printf "f/%s" $fclean) }}
         {{ end }}
         {{ with $exif.Tags.ExposureTime }}{{ $parts = $parts | append . }}{{ end }}
         {{ $iso := or $exif.Tags.ISOSpeedRatings $exif.Tags.PhotographicSensitivity }}
         {{ with $iso }}{{ $parts = $parts | append (printf "ISO %v" .) }}{{ end }}
-        {{ $focal := or $exif.Tags.FocalLengthIn35mmFilm $exif.Tags.FocalLength }}
-        {{ with $focal }}{{ $parts = $parts | append (printf "%v" .) }}{{ end }}
         {{ if gt (len $parts) 0 }}<div class="meta">{{ delimit $parts " · " }}</div>{{ end }}
       {{ end }}
     </figure>
