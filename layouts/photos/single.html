@@ -28,7 +28,12 @@
       {{ $exif := .Exif }}
       {{ if $exif }}
         {{ $parts := slice }}
-        {{ with $exif.Tags.Model }}{{ $parts = $parts | append . }}{{ end }}
+        {{ with $exif.Tags.Model }}
+          {{ $model := . }}
+          {{ $model = replace $model "Leica M11 Monochrom" "Leica M" }}
+          {{ $model = replace $model "Leica M11" "Leica M" }}
+          {{ $parts = $parts | append $model }}
+        {{ end }}
         {{ with $exif.Tags.LensModel }}{{ $parts = $parts | append . }}{{ end }}
         {{ $fraw := printf "%v" $exif.Tags.FNumber }}
         {{ $fclean := replace (lower $fraw) "f/" "" }}
