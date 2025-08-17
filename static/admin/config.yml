@@ -1,10 +1,14 @@
+publish_mode: editorial_workflow
+show_preview_links: true
 backend:
   name: github
   repo: crawfordlong/crawfordlong-com-2025
   branch: main
-  base_url: https://crawfordlong.com
-  auth_endpoint: /oauth
-
+  base_url: https://www.crawfordlong.com
+  auth_endpoint: /api/auth
+  squash_merges: true
+  preview_context: 'cloudflare preview deploy'
+  
 site_url: https://crawfordlong.com
 display_url: https://crawfordlong.com
 
