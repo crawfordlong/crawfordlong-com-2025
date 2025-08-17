@@ -3,15 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <title>Content Manager</title>
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="https://unpkg.com/decap-cms@^3/dist/decap-cms.js"></script>
   </head>
   <body>
     <script>
+      // If this loads, the UI will render. If it doesn't, check your network/console.
       window.CMS_MANUAL_INIT = true;
-    </script>
-    <script>
-      CMS.init();
+      CMS.init(); // will fetch /admin/config.yml next
     </script>
   </body>
 </html>
-
