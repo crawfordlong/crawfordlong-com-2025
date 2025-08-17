@@ -44,9 +44,9 @@
 
         {{/* ISO */}}
         {{ $iso := "" }}
-        {{ with .Tags.PhotographicSensitivity }}{{ $iso = . }}{{ end }}
-        {{ if eq $iso "" }}{{ with .Tags.ISOSpeedRatings }}{{ $iso = . }}{{ end }}{{ end }}
-        {{ if eq $iso "" }}{{ with .Tags.ISO }}{{ $iso = . }}{{ end }}{{ end }}
+        {{ with .Tags.PhotographicSensitivity }}{{ $iso = printf "%v" . }}{{ end }}
+        {{ if eq $iso "" }}{{ with .Tags.ISOSpeedRatings }}{{ $iso = printf "%v" . }}{{ end }}{{ end }}
+        {{ if eq $iso "" }}{{ with .Tags.ISO }}{{ $iso = printf "%v" . }}{{ end }}{{ end }}
 
         {{ if $iso }}
           {{ $parts = $parts | append (printf "ISO %s" $iso) }}
