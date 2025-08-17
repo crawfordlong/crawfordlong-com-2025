@@ -3,7 +3,7 @@ show_preview_links: true
 backend:
   name: github
   repo: crawfordlong/crawfordlong-com-2025
-  branch: main
+  branch: trunk
   base_url: https://www.crawfordlong.com
   auth_endpoint: /api/auth
   squash_merges: true
