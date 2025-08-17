@@ -31,64 +31,53 @@
 
       {{/* EXIF line still reads from the original in memory only; not embedded in $heroSafe */}}
 
-        {{ with $hero.Exif }}
-          {{ $tags := .Tags }}
-          {{ $parts := slice }}
+      {{ with $hero.Exif }}
+        {{ $tags := .Tags }}
+        {{ $parts := slice }}
 
-          {{/* --- Camera Model (robust + Leica collapse + Apple fallback) --- */}}
-          {{ $modelRaw := or (index $tags "Model") (index $tags "CameraModelName") (index $tags "DeviceModelName") (index $tags "Image Model") }}
-          {{ $makeRaw  := (index $tags "Make") }}
+        {{/* --- Camera Model (sanitize; Apple fallback; collapse Leica M## → "Leica M") --- */}}
+        {{ $model := "" }}
 
-          {{/* sanitize helper (coerce to string, strip control, normalize spaces) */}}
-          {{ $sanitize := func (v any) (string) }}
-            {{ $s := printf "%v" v }}
-            {{ $s = replaceRE "[[:cntrl:]\u0000]+" "" $s }}
-            {{ $s = replaceRE "[[:space:]]+" " " $s | trim " " }}
-            {{ return $s }}
-          {{ end }}
-
-          {{ $model := $sanitize $modelRaw }}
-          {{ $make  := $sanitize $makeRaw }}
-
-          {{/* Apple fallback: build "iPhone 15 Pro Max" from LensModel if Model missing */}}
-          {{ if eq $model "" }}
-            {{ $lensModel := $sanitize (index $tags "LensModel") }}
-            {{ if and (ne $lensModel "") (match $lensModel "(?i)^iphone\\b") }}
-              {{/* keep leading 'iPhone <num> <suffix>' before ' camera' if present */}}
-              {{ $m := replaceRE "(?i)^(iPhone\\s+[0-9]+(?:\\s+[A-Za-z]+){0,2}).*" "$1" $lensModel }}
-              {{ if ne $m "" }}{{ $model = $m }}{{ end }}
-            {{ end }}
-          {{ end }}
-
-          {{/* Leica collapse only if it actually looks like a Leica M## */}}
-          {{ if match $model "(?i)^leica\\s+m[0-9]+\\b" }}
-            {{ $model = "Leica M" }}
-          {{ end }}
-
-          {{ if ne $model "" }}
-            {{ $parts = $parts | append $model }}
-          {{ else if ne $make "" }}
-            {{/* last-ditch: show Make if absolutely nothing else */}}
-            {{ $parts = $parts | append $make }}
-          {{ end }}
-
-          {{/* Shutter */}}
-          {{ with (index $tags "ExposureTime") }}
-            {{ $parts = $parts | append . }}
-          {{ end }}
-
-          {{/* ISO (handle multiple keys and slice forms) */}}
-          {{ $isoRaw := or (index $tags "PhotographicSensitivity") (index $tags "ISOSpeedRatings") (index $tags "ISO") }}
-          {{ with $isoRaw }}
-            {{ $isoStr := printf "%v" . | replaceRE "^\\[|\\]$" "" }}
-            {{ $isoFirst := index (split $isoStr " ") 0 }}
-            {{ if and $isoFirst (ne $isoFirst "0") (ne $isoFirst "<nil>") }}
-              {{ $parts = $parts | append (printf "ISO %s" $isoFirst) }}
-            {{ end }}
-          {{ end }}
-
-          {{ if gt (len $parts) 0 }}<div class="meta">{{ delimit $parts " · " }}</div>{{ end }}
+        {{ with (or (index $tags "Model") (index $tags "CameraModelName") (index $tags "DeviceModelName") (index $tags "Image Model")) }}
+          {{ $m := printf "%s" . }}                                  {{/* coerce []byte/string → string */}}
+          {{ $m = replaceRE "[^[:print:]]" "" $m }}                  {{/* strip non-printables */}}
+          {{ $m = replaceRE "[[:space:]]+" " " $m | trim " " }}
+          {{ $model = $m }}
         {{ end }}
+
+        {{ if eq $model "" }}
+          {{ with (index $tags "LensModel") }}                       {{/* iPhone fallback from LensModel */}}
+            {{ $lm := printf "%s" . | replaceRE "[^[:print:]]" "" | replaceRE "[[:space:]]+" " " | trim " " }}
+            {{ $pref := replaceRE "(?i)^(iPhone\\s+[0-9]+(?:\\s+[A-Za-z]+){0,3}).*" "$1" $lm }}
+            {{ if ne $pref "" }}
+              {{ $model = $pref }}
+            {{ else if gt (len (findRE "(?i)^iPhone\\b" $lm)) 0 }}
+              {{ $model = $lm }}
+            {{ end }}
+          {{ end }}
+        {{ end }}
+
+        {{ if gt (len (findRE "(?i)^leica\\s+m[0-9]+\\b" $model)) 0 }}
+          {{ $model = "Leica M" }}
+        {{ end }}
+
+        {{ if ne $model "" }}
+          {{ $parts = $parts | append $model }}
+        {{ end }}
+
+        {{/* Shutter */}}
+        {{ with (index $tags "ExposureTime") }}
+          {{ $parts = $parts | append . }}
+        {{ end }}
+
+        {{/* ISO: handle variant keys and slice forms like [200] */}}
+        {{ $isoRaw := or (index $tags "PhotographicSensitivity") (index $tags "ISOSpeedRatings") (index $tags "ISO") }}
+        {{ with $isoRaw }}
+          {{ $isoStr := printf "%v" . }}
+          {{ $isoStr = replaceRE "[\\[\\],]" " " $isoStr | replaceRE "[[:space:]]+" " " | trim " " }}
+          {{ $isoFirst := index (split $isoStr " ") 0 }}
+          {{ if and $isoFirst (ne $isoFirst "0") (ne $isoFirst "<nil>") }}
+            {{ $parts = $parts
 
 
     </figure>
