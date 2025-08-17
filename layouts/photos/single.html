@@ -31,60 +31,69 @@
 
       {{/* EXIF line still reads from the original in memory only; not embedded in $heroSafe */}}
 
-      {{ with $hero.Exif }}
-        {{ $tags := .Tags }}
-        {{ $parts := slice }}
+        {{ with $hero.Exif }}
+          {{ $tags := .Tags }}
+          {{ $parts := slice }}
 
-        {{/* --- Camera Model (sanitize; Apple fallback; collapse Leica M## → "Leica M") --- */}}
-        {{ $model := "" }}
-
-        {{ with (or (index $tags "Model") (index $tags "CameraModelName") (index $tags "DeviceModelName") (index $tags "Image Model")) }}
-          {{ $m := printf "%s" . }}
-          {{ $m = replaceRE "[^[:print:]]" "" $m }}
-          {{ $m = replaceRE "[[:space:]]+" " " $m | trim " " }}
-          {{ $model = $m }}
-        {{ end }}
-
-        {{ if eq $model "" }}
-          {{ with (index $tags "LensModel") }}
-            {{ $lm := printf "%s" . | replaceRE "[^[:print:]]" "" | replaceRE "[[:space:]]+" " " | trim " " }}
-            {{ $pref := replaceRE "(?i)^(iPhone\\s+[0-9]+(?:\\s+[A-Za-z]+){0,3}).*" "$1" $lm }}
-            {{ if ne $pref "" }}
-              {{ $model = $pref }}
-            {{ else if gt (len (findRE "(?i)^iPhone\\b" $lm)) 0 }}
-              {{ $model = $lm }}
+          {{/* --- MODEL: find by scanning keys (case-insensitive) --- */}}
+          {{ $model := "" }}
+          {{ range $k, $v := $tags }}
+            {{ $lk := lower (printf "%s" $k) }}
+            {{ if or (eq $lk "model") (eq $lk "cameramodelname") (eq $lk "devicemodelname") (eq $lk "image model") }}
+              {{ $m := printf "%v" $v }}
+              {{ $m = replaceRE "[^[:print:]]" "" $m }}
+              {{ $m = replaceRE "[[:space:]]+" " " $m | trim " " }}
+              {{ if ne $m "" }}{{ $model = $m }}{{ end }}
             {{ end }}
           {{ end }}
-        {{ end }}
 
-        {{ if gt (len (findRE "(?i)^leica\\s+m[0-9]+\\b" $model)) 0 }}
-          {{ $model = "Leica M" }}
-        {{ end }}
+          {{/* Apple fallback if model empty: some iPhone shots only expose LensModel */}}
+          {{ if eq $model "" }}
+            {{ $lm := "" }}
+            {{ with (index $tags "LensModel") }}
+              {{ $lm = printf "%v" . | replaceRE "[^[:print:]]" "" | replaceRE "[[:space:]]+" " " | trim " " }}
+            {{ end }}
+            {{ if and (ne $lm "") (gt (len (findRE "(?i)^iphone\\b" $lm)) 0) }}
+              {{ $pref := replaceRE "(?i)^(iPhone\\s+[0-9]+(?:\\s+[A-Za-z]+){0,3}).*" "$1" $lm }}
+              {{ if ne $pref "" }}{{ $model = $pref }}{{ else }}{{ $model = $lm }}{{ end }}
+            {{ end }}
+          {{ end }}
 
-        {{ if ne $model "" }}
-          {{ $parts = $parts | append $model }}
-        {{ end }}
+          {{/* Collapse Leica M-series only */}}
+          {{ if and (ne $model "") (gt (len (findRE "(?i)^leica\\s+m[0-9]+\\b" $model)) 0) }}
+            {{ $model = "Leica M" }}
+          {{ end }}
 
-        {{/* Shutter */}}
-        {{ with (index $tags "ExposureTime") }}
-          {{ $parts = $parts | append . }}
-        {{ end }}
+          {{ if ne $model "" }}
+            {{ $parts = $parts | append $model }}
+          {{ end }}
 
-        {{/* ISO: handle variant keys and slice forms like [200] */}}
-        {{ $isoRaw := or (index $tags "PhotographicSensitivity") (index $tags "ISOSpeedRatings") (index $tags "ISO") }}
-        {{ with $isoRaw }}
-          {{ $isoStr := printf "%v" . }}
-          {{ $isoStr = replaceRE "[\\[\\],]" " " $isoStr | replaceRE "[[:space:]]+" " " | trim " " }}
-          {{ $isoFirst := index (split $isoStr " ") 0 }}
-          {{ if and $isoFirst (ne $isoFirst "0") (ne $isoFirst "<nil>") }}
-            {{ $parts = $parts | append (printf "ISO %s" $isoFirst) }}
+          {{/* --- SHUTTER --- */}}
+          {{ with (index $tags "ExposureTime") }}
+            {{ $parts = $parts | append . }}
+          {{ end }}
+
+          {{/* --- ISO: pick first tag that looks like ISO, normalize slice forms --- */}}
+          {{ $iso := "" }}
+          {{ range $k, $v := $tags }}
+            {{ $lk := lower (printf "%s" $k) }}
+            {{ if or (eq $lk "photographicsensitivity") (eq $lk "isospeedratings") (eq $lk "iso") (hasPrefix $lk "iso") }}
+              {{ $val := printf "%v" $v }}
+              {{ $val = replaceRE "[\\[\\],]" " " $val | replaceRE "[[:space:]]+" " " | trim " " }}
+              {{ $first := index (split $val " ") 0 }}
+              {{ if and (ne $first "") (ne $first "0") (ne $first "<nil>") (eq $iso "") }}
+                {{ $iso = $first }}
+              {{ end }}
+            {{ end }}
+          {{ end }}
+          {{ if ne $iso "" }}
+            {{ $parts = $parts | append (printf "ISO %s" $iso) }}
+          {{ end }}
+
+          {{ if gt (len $parts) 0 }}
+            <div class="meta">{{ delimit $parts " · " }}</div>
           {{ end }}
         {{ end }}
-
-        {{ if gt (len $parts) 0 }}
-          <div class="meta">{{ delimit $parts " · " }}</div>
-        {{ end }}
-      {{ end }}
 
 
 
