@@ -29,7 +29,7 @@ collections:
     editor:
       preview: true
     fields:
-      - {name: title, widget: string, required: false}
+      - {name: title, widget: string, required: true}
       - {name: date,  widget: datetime}
       - {name: caption, widget: string, required: false}
       - {name: image, label: Cover Image (optional), widget: image, required: false}
@@ -46,7 +46,7 @@ collections:
     media_folder: ""
     public_folder: ""
     fields:
-      - {name: title, widget: string, required: false}
+      - {name: title, widget: string, required: true}
       - {name: date,  widget: datetime}
       - {name: body, widget: markdown}
 
