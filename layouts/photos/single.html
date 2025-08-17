@@ -15,23 +15,26 @@
 
   {{/* large hero without upscaling */}}
   {{ $heroBig := $hero }}
-  {{ if $hero }}{{ if gt $hero.Width 1600 }}{{ $heroBig = $hero.Resize "1600x" }}{{ end }}{{ end }}
+  {{/* pick the first image as before */}}
+  {{ $imgs := sort (.Resources.ByType "image") "Name" }}
+  {{ $hero := index $imgs 0 }}
 
-  <figure>
-    {{ with $heroBig }}
-      <img id="hero" class="hero" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="">
-    {{ end }}
-    {{ with .Params.caption }}<figcaption>{{ . }}</figcaption>{{ end }}
+  {{/* always publish a processed hero: cap width at 1600 and re-encode */}}
+  {{- if $hero -}}
+    {{- $targetW := 1600 -}}
+    {{- if lt $hero.Width $targetW }}{{ $targetW = $hero.Width }}{{ end }}
+    {{/* Force re-encode (strips metadata) at same-or-smaller width; choose your format */}}
+    {{- $heroSafe := $hero.Resize (printf "%dx webp" $targetW) -}}
+    <figure>
+      <img id="hero" class="hero" src="{{ $heroSafe.RelPermalink }}" width="{{ $heroSafe.Width }}" height="{{ $heroSafe.Height }}" alt="">
+      {{ with .Params.caption }}<figcaption>{{ . }}</figcaption>{{ end }}
 
-    {{/* EXIF line (skip nonsense f/0 etc.) */}}
-    {{ with $hero }}
-      {{ $exif := .Exif }}
-      {{ if $exif }}
+      {{/* EXIF line still reads from the original in memory only; not embedded in $heroSafe */}}
+      {{ with $hero.Exif }}
+        {{ $exif := . }}
         {{ $parts := slice }}
         {{ with $exif.Tags.Model }}
-          {{ $model := . }}
-          {{ $model = replace $model "Leica M11 Monochrom" "Leica M" }}
-          {{ $model = replace $model "Leica M11" "Leica M" }}
+          {{ $model := replaceRE "Leica M[0-9]+.*" "Leica M" . }}
           {{ $parts = $parts | append $model }}
         {{ end }}
         {{ with $exif.Tags.LensModel }}{{ $parts = $parts | append . }}{{ end }}
@@ -47,26 +50,23 @@
         {{ with $focal }}{{ $parts = $parts | append (printf "%v" .) }}{{ end }}
         {{ if gt (len $parts) 0 }}<div class="meta">{{ delimit $parts " · " }}</div>{{ end }}
       {{ end }}
-    {{ end }}
-  </figure>
+    </figure>
+  {{- end -}}
 
+  {{/* Thumbs/filmstrip: always process (strips metadata) */}}
   {{ if gt (len $imgs) 1 }}
-    <section class="filmstrip" id="filmstrip" aria-label="More photos in this post">
-      {{ range $i, $im := $imgs }}
-        {{/* thumbnails: same height (110px), keep aspect, no upscaling */}}
-        {{ $thumb := $im }}{{ if gt $im.Height 110 }}{{ $thumb = $im.Resize "x110" }}{{ end }}
-        {{/* full-size target for hero without upscaling */}}
-        {{ $full := $im }}{{ if gt $im.Width 1600 }}{{ $full = $im.Resize "1600x" }}{{ end }}
-        <a href="{{ .RelPermalink }}"
-           class="thumb{{ if eq $i 0 }} active{{ end }}"
-           data-full="{{ $full.RelPermalink }}"
-           data-w="{{ $full.Width }}"
-           data-h="{{ $full.Height }}"
-           aria-label="Show this photo">
-          <img src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" alt="">
-        </a>
-      {{ end }}
-    </section>
+  <section class="filmstrip" id="filmstrip" aria-label="More photos in this post">
+    {{ range $i, $im := $imgs }}
+      {{ $thumb := $im.Resize "x110 webp" }}
+      {{ $fullW := cond (gt $im.Width 1600) 1600 $im.Width }}
+      {{ $full := $im.Resize (printf "%dx webp" $fullW) }}
+      <a href="{{ .RelPermalink }}" class="thumb{{ if eq $i 0 }} active{{ end }}"
+         data-full="{{ $full.RelPermalink }}" data-w="{{ $full.Width }}" data-h="{{ $full.Height }}"
+         aria-label="Show this photo">
+        <img src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" alt="">
+      </a>
+    {{ end }}
+  </section>
   {{ end }}
 
   {{ if .Content }}
