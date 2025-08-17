@@ -24,6 +24,10 @@ collections:
     path: "{{year}}/{{month}}/{{day}}/{{hour}}{{minute}}-{{slug}}/index"
     media_folder: ""      # upload beside index.md
     public_folder: ""
+    slug: "{{slug}}"
+    preview_path: '{{slug}}'
+    editor:
+      preview: true
     fields:
       - {name: title, widget: string, required: false}
       - {name: date,  widget: datetime}
@@ -35,6 +39,10 @@ collections:
     folder: "content/notes"
     create: true
     path: "{{year}}/{{month}}/{{day}}/{{hour}}{{minute}}-{{slug}}/index"
+    slug: "{{slug}}"
+    preview_path: '{{slug}}'
+    editor:
+      preview: true
     media_folder: ""
     public_folder: ""
     fields:
