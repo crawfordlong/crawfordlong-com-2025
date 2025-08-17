@@ -30,19 +30,37 @@
       {{ with .Params.caption }}<figcaption>{{ . }}</figcaption>{{ end }}
 
       {{/* EXIF line still reads from the original in memory only; not embedded in $heroSafe */}}
+
       {{ with $hero.Exif }}
-        {{ $exif := . }}
+        {{ $tags := .Tags }}
         {{ $parts := slice }}
-        {{ with $exif.Tags.Model }}
+
+        {{/* Camera Model: show whatever is reported, except collapse Leica M## variants to "Leica M" */}}
+        {{ with (index $tags "Model") }}
           {{ $raw := replaceRE "[[:space:]]+" " " . | trim " " }}
           {{ $model := replaceRE "(?i)^leica m[0-9]+.*" "Leica M" $raw }}
           {{ $parts = $parts | append $model }}
         {{ end }}
-        {{ with $exif.Tags.ExposureTime }}{{ $parts = $parts | append . }}{{ end }}
-        {{ $iso := or $exif.Tags.ISOSpeedRatings $exif.Tags.PhotographicSensitivity }}
-        {{ with $iso }}{{ $parts = $parts | append (printf "ISO %v" .) }}{{ end }}
+
+        {{/* Shutter */}}
+        {{ with (index $tags "ExposureTime") }}
+          {{ $parts = $parts | append . }}
+        {{ end }}
+
+        {{/* ISO: handle multiple possible keys and slice forms */}}
+        {{ $isoRaw := or (index $tags "PhotographicSensitivity") (index $tags "ISOSpeedRatings") (index $tags "ISO") }}
+        {{ with $isoRaw }}
+          {{ $isoStr := printf "%v" . | replaceRE "^\\[|\\]$" "" }}
+          {{ $isoFirst := index (split $isoStr " ") 0 }}
+          {{ if and $isoFirst (ne $isoFirst "0") (ne $isoFirst "<nil>") }}
+            {{ $parts = $parts | append (printf "ISO %s" $isoFirst) }}
+          {{ end }}
+        {{ end }}
+
         {{ if gt (len $parts) 0 }}<div class="meta">{{ delimit $parts " · " }}</div>{{ end }}
       {{ end }}
+
+
     </figure>
   {{- end -}}
 
