@@ -5,7 +5,7 @@ title = "crawfordlong.com"
 buildFuture = true
 
 [pagination]
-pagerSize = 6
+pagerSize = 12
 
 [permalinks]
 photos = "/:2006/:01/:02/:1504-:slug/"
