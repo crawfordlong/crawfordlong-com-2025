@@ -1,6 +1,6 @@
 baseURL = "https://crawfordlong.com/"
 uglyURLs = false
-disableKinds = ["term", "section"]
+disableKinds = ["section"]
 title = "crawfordlong.com"
 buildFuture = true
 
