@@ -49,4 +49,13 @@ collections:
       - {name: title, widget: string, required: true}
       - {name: date,  widget: datetime}
       - {name: body, widget: markdown}
+  - name: "pages"
+    label: "Pages"
+    folder: "content/pages"  # adjust path as needed
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Body", name: "body", widget: "markdown"}
+
 
