@@ -20,6 +20,19 @@
       <img id="hero" class="hero" src="{{ $heroSafe.RelPermalink }}" width="{{ $heroSafe.Width }}" height="{{ $heroSafe.Height }}" alt="">
       {{ with .Params.caption }}<figcaption>{{ . }}</figcaption>{{ end }}
 
+      {{ if $parts }}
+        <div class="meta">{{ delimit $parts " · " }}</div>
+      {{ end }}
+
+      {{/* Tags */}}
+      {{ with .Params.tags }}
+        <div class="tags">
+          {{ range . }}
+            <a href="/tags/{{ . | urlize }}/" class="tag">#{{ . }}</a>
+          {{ end }}
+        </div>
+      {{ end }}
+
       {{ with $hero.Exif }}
         {{ $parts := slice }}
 

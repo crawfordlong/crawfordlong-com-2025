@@ -276,3 +276,7 @@ article {
   line-height: 120%;
   margin: 0 auto;
 }
+
+a.tag {
+  font-weight: bold;
+}
