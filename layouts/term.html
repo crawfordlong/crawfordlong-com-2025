@@ -1,8 +1,13 @@
-{{ define "main" }}
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/css/main.css">
+<title>{{ .Title }} · {{ .Site.Title }}</title>
+{{ partial "header.html" . }}
+
+<main>
   <h1>{{ .Title }}</h1>
-  {{ .Content }}
   {{ range .Pages }}
     <h2><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></h2>
   {{ end }}
-{{ end }}
-
+</main>

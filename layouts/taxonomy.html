@@ -1,8 +1,13 @@
-{{ define "main" }}
-  <h1>{{ .Title }}</h1>
-  {{ .Content }}
-  {{ range .Data.Terms.ByCount }}
-    <h2><a href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }}</a> ({{ .Count }})</h2>
-  {{ end }}
-{{ end }}
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/css/main.css">
+<title>{{ .Title }} · {{ .Site.Title }}</title>
+{{ partial "header.html" . }}
 
+<main>
+  <h1>{{ .Title }}</h1>
+  {{ range .Data.Terms.ByCount }}
+    <a href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }}</a> ({{ .Count }})
+  {{ end }}
+</main>
