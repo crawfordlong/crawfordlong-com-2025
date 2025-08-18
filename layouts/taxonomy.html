@@ -6,7 +6,7 @@
 {{ partial "header.html" . }}
 
 <main>
-  <h1>{{ .Title }}</h1>
+  <h1 class="taxonomy">{{ .Title }}</h1>
   {{ range .Data.Terms.ByCount }}
     <a href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }}</a> ({{ .Count }})
   {{ end }}
