@@ -8,7 +8,7 @@
 <main>
   <h1>Tagged: {{ .Title }}</h1>
 
-  {{ range .Pages }}
+  {{ range .Data.Pages }}
     <article>
       <h2><a href="{{ .Permalink }}">{{ .Title }}</a></h2>
       <time>{{ .Date.Format "Jan 2, 2006" }}</time>

@@ -8,7 +8,13 @@
 <main>
   <h1>Tags</h1>
 
+  <p>Debug info:</p>
+  <pre>{{ printf "%#v" .Site.Taxonomies }}</pre>
+
+  <p>Tags specifically:</p>
+  <pre>{{ printf "%#v" .Site.Taxonomies.tags }}</pre>
+
   {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
-    <a href="/tags/{{ $name | urlize }}/">{{ $name }}</a> ({{ $taxonomy.Count }})
+    <p>Tag: {{ $name }} ({{ $taxonomy.Count }})</p>
   {{ end }}
 </main>
