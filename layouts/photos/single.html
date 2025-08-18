@@ -16,13 +16,10 @@
     {{- $targetW := 1600 -}}
     {{- if lt $hero.Width $targetW }}{{ $targetW = $hero.Width }}{{ end }}
     {{- $heroSafe := $hero.Resize (printf "%dx webp" $targetW) -}}
+
     <figure>
       <img id="hero" class="hero" src="{{ $heroSafe.RelPermalink }}" width="{{ $heroSafe.Width }}" height="{{ $heroSafe.Height }}" alt="">
       {{ with .Params.caption }}<figcaption>{{ . }}</figcaption>{{ end }}
-
-      {{ if $parts }}
-        <div class="meta">{{ delimit $parts " · " }}</div>
-      {{ end }}
 
       {{/* Tags */}}
       {{ with .Params.tags }}
@@ -70,6 +67,7 @@
         {{ end }}
       {{ end }}
     </figure>
+
   {{- end -}}
 
   {{ if gt (len $imgs) 1 }}
