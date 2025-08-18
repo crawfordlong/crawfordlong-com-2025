@@ -277,6 +277,7 @@ article {
   margin: 0 auto;
 }
 
-a.tag {
+a.tag, a.tag:hover, a.tag:active, a.tag:visited {
   font-weight: bold;
+  color: #111;  
 }
