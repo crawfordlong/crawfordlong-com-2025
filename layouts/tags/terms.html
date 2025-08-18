@@ -8,7 +8,7 @@
 <main>
   <h1>Tags</h1>
 
-  {{ range .Site.Taxonomies.tags }}
-    <a href="{{ .Page.Permalink }}">{{ .Page.Title }}</a> ({{ .Count }})
+  {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
+    <a href="/tags/{{ $name | urlize }}/">{{ $name }}</a> ({{ $taxonomy.Count }})
   {{ end }}
 </main>
