@@ -13,3 +13,6 @@ notes  = "/:2006/:01/:02/:1504-:slug/"
 
 [imaging]
 resampleFilter = "Lanczos"
+
+[taxonomies]
+tag = "tags"
