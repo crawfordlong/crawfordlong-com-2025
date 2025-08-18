@@ -1,13 +1,70 @@
-<!doctype html>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="/css/main.css">
-<title>{{ .Title }} · {{ .Site.Title }}</title>
-{{ partial "header.html" . }}
+{{define "main"}}
+  <h1 class="taxonomy">{{.Title}}</h1>
 
-<main>
-  <h1>{{ .Title }}</h1>
-  {{ range .Pages }}
-    <h2><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></h2>
+  {{ $sorted := sort .Pages "Date" "desc" }}
+  {{ $p := .Paginate $sorted }}
+
+  <main class="masonry" id="masonry">
+    {{ range $p.Pages }}
+
+      {{ $images := .Resources.ByType "image" }}
+      {{ $count := len $images }}
+
+      {{ if gt $count 0 }}
+        {{ $img := index $images 0 }}
+        {{ $img800 := $img }}{{ if gt $img.Width 800 }}{{ $img800 = $img.Resize "800x" }}{{ end }}
+        {{ $img400 := $img }}{{ if gt $img.Width 400 }}{{ $img400 = $img.Resize "400x" }}{{ end }}
+        <a class="card photo" href="{{ .RelPermalink }}" aria-label="View photo">
+          <img
+            loading="lazy" decoding="async"
+            src="{{ $img800.RelPermalink }}"
+            srcset="{{ $img400.RelPermalink }} 400w, {{ $img800.RelPermalink }} 800w"
+            sizes="(max-width:700px) 100vw, 320px"
+            width="{{ $img800.Width }}" height="{{ $img800.Height }}" alt="">
+          {{ if gt $count 1 }}<span class="count-badge">{{ $count }}</span>{{ end }}
+        </a>
+      {{ else }}
+        {{ $plain := .Plain | replaceRE `\s+` " " | trim " " }}
+        {{ if gt (len $plain) 240 }}
+          {{ $first := substr $plain 0 240 }}
+          {{ $clean := replaceRE `\s+\S*$` "" $first }}
+          <a class="card note" href="{{ .RelPermalink }}"><p>{{ $clean }}</p></a>
+        {{ else }}
+          <a class="card note" href="{{ .RelPermalink }}"><p>{{ .RawContent | safeHTML }}</p></a>
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  </main>
+
+  {{ if $p.HasNext }}
+    <nav class="pagination">
+      <a class="pagination__next" href="{{ $p.Next.URL | relURL }}">Next</a>
+    </nav>
+
+    <div class="page-load-status" role="status" aria-live="polite">
+      <p class="infinite-scroll-request">Loading…</p>
+      <p class="infinite-scroll-last fancy-last"><span>No more posts</span></p>
+      <p class="infinite-scroll-error">No more pages to load</p>
+    </div>
   {{ end }}
-</main>
+
+  <script defer src="https://unpkg.com/infinite-scroll@5/dist/infinite-scroll.pkgd.min.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const grid = document.getElementById('masonry');
+    if (!grid) return;
+    new InfiniteScroll(grid, {
+      path: '.pagination__next',
+      append: '.card',
+      checkLastPage: true,
+      prefill: false,
+      history: false,
+      hideNav: '.pagination',
+      status: '.page-load-status',
+      responseBody: 'text',
+      domParseResponse: true,
+      fetchOptions: { cache: 'no-store' }
+    });
+  });
+  </script>
+{{end}}
