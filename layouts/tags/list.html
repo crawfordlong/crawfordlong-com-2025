@@ -6,13 +6,12 @@
 {{ partial "header.html" . }}
 
 <main>
-  <h1>{{ .Title }}</h1>
+  <h1>Tagged: {{ .Title }}</h1>
 
   {{ range .Pages }}
     <article>
-      <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      <h2><a href="{{ .Permalink }}">{{ .Title }}</a></h2>
       <time>{{ .Date.Format "Jan 2, 2006" }}</time>
     </article>
   {{ end }}
 </main>
-

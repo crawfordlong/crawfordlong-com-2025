@@ -8,8 +8,7 @@
 <main>
   <h1>Tags</h1>
 
-  {{ range .Data.Terms.Alphabetical }}
-    <a href="{{ .Page.RelPermalink }}">{{ .Page.Title }}</a> ({{ .Count }})
+  {{ range .Site.Taxonomies.tags }}
+    <a href="{{ .Page.Permalink }}">{{ .Page.Title }}</a> ({{ .Count }})
   {{ end }}
 </main>
-
