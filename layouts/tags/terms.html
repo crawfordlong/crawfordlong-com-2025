@@ -1,0 +1,15 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/css/main.css">
+<title>Tags · {{ .Site.Title }}</title>
+{{ partial "header.html" . }}
+
+<main>
+  <h1>Tags</h1>
+
+  {{ range .Data.Terms.Alphabetical }}
+    <a href="{{ .Page.RelPermalink }}">{{ .Page.Title }}</a> ({{ .Count }})
+  {{ end }}
+</main>
+
