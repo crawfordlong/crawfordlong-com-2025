@@ -9,13 +9,13 @@
 <body>
 {{ partial "header.html" . }}
 
-<h1 class="taxonomy">{{.Title}}</h1>
-
 {{ $all := .Pages }}
 {{ $sorted := sort $all "Date" "desc" }}
 {{ $p := .Paginate $sorted }}
 
 <main class="masonry" id="masonry">
+  <h1 class="taxonomy">{{.Title}}</h1>
+
   {{ range $p.Pages }}
 
     {{ $images := .Resources.ByType "image" }}
