@@ -11,6 +11,7 @@
 {{ $p := .Paginate $sorted }}
 
 <main class="masonry" id="masonry">
+  <div class="grid-sizer"></div>
   {{ range $p.Pages }}
 
     {{ $images := .Resources.ByType "image" }}
@@ -68,14 +69,28 @@
   </script>
 {{ end }}
 
-<script defer src="https://unpkg.com/infinite-scroll@5/dist/infinite-scroll.pkgd.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script src="https://unpkg.com/infinite-scroll@5/dist/infinite-scroll.pkgd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   const grid = document.getElementById('masonry');
   if (!grid) return;
+
+  const msnry = new Masonry(grid, {
+    itemSelector: '.card',
+    columnWidth: '.grid-sizer',
+    gutter: 10,
+    fitWidth: true,
+    transitionDuration: 0
+  });
+
+  imagesLoaded(grid, () => msnry.layout());
+
   new InfiniteScroll(grid, {
     path: '.pagination__next',
     append: '.card',
+    outlayer: msnry,
     checkLastPage: true,
     prefill: false,
     history: false,
