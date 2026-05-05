@@ -22,7 +22,7 @@
       {{ $img := index $images 0 }}
       {{ $img800 := $img }}{{ if gt $img.Width 800 }}{{ $img800 = $img.Resize "800x" }}{{ end }}
       {{ $img400 := $img }}{{ if gt $img.Width 400 }}{{ $img400 = $img.Resize "400x" }}{{ end }}
-      <a class="card photo" href="{{ .RelPermalink }}" aria-label="View photo">
+      <a class="card photo" href="{{ .RelPermalink }}" data-ym="{{ .Date.Format "2006-01" }}" aria-label="View photo">
         <img
           loading="lazy" decoding="async"
           src="{{ $img800.RelPermalink }}"
@@ -37,7 +37,7 @@
       {{ if gt (len $plain) 240 }}
         {{ $first := substr $plain 0 240 }}
         {{ $clean := replaceRE `\s+\S*$` "" $first }}
-        <a class="card note" href="{{ .RelPermalink }}"><p>{{ $clean }}</p></a>
+        <a class="card note" href="{{ .RelPermalink }}" data-ym="{{ .Date.Format "2006-01" }}"><p>{{ $clean }}</p></a>
       {{ else }}
           <!-- <pre> -->
     <!-- File: {{ .File.Path }} -->
@@ -48,7 +48,7 @@
     <!-- Summary: [{{ .Summary }}] -->
     <!-- RawContent: [{{ .RawContent | safeHTML }}] -->
   <!-- </pre> -->
-        <a class="card note" href="{{ .RelPermalink }}"><p>{{ .RawContent | safeHTML }}</p></a>
+        <a class="card note" href="{{ .RelPermalink }}" data-ym="{{ .Date.Format "2006-01" }}"><p>{{ .RawContent | safeHTML }}</p></a>
       {{ end }}
     {{ end }}
   {{ end }}
@@ -79,6 +79,28 @@ document.addEventListener('DOMContentLoaded', function () {
   const grid = document.getElementById('masonry');
   if (!grid) return;
 
+  const main = grid.parentNode;
+  const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+
+  const placeMarkers = () => {
+    main.querySelectorAll('.month-marker').forEach(el => el.remove());
+    const mainTop = main.getBoundingClientRect().top;
+    let prevYM = null;
+    let prevYear = null;
+    grid.querySelectorAll('.card').forEach(card => {
+      const ym = card.dataset.ym;
+      if (!ym || ym === prevYM) return;
+      const [year, month] = ym.split('-');
+      const m = document.createElement('div');
+      m.className = 'month-marker' + (prevYear && year !== prevYear ? ' year-change' : '');
+      m.textContent = `${MONTHS[parseInt(month, 10) - 1]} ${year}`;
+      m.style.top = (card.getBoundingClientRect().top - mainTop) + 'px';
+      main.appendChild(m);
+      prevYM = ym;
+      prevYear = year;
+    });
+  };
+
   const msnry = new Masonry(grid, {
     itemSelector: '.card',
     columnWidth: '.grid-sizer',
@@ -86,6 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
     fitWidth: true,
     transitionDuration: 0
   });
+  msnry.on('layoutComplete', placeMarkers);
 
   imagesLoaded(grid, () => msnry.layout());
 

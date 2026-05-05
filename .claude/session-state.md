@@ -1,22 +1,24 @@
 # OBJECTIVE
-Swap homepage gallery from CSS multi-column to Masonry.js so infinite-scroll appends don't reflow already-rendered cards.
+Homepage gallery: Masonry.js (no reflow on append) + month/year markers in left gutter.
 
 # PLAN
-1. [x] layouts/index.html: masonry-layout + imagesloaded scripts; .grid-sizer; Masonry + InfiniteScroll outlayer init.
-2. [x] static/css/main.css: drop column-* rules; pin .card to 320px (100% ≤700px); matching .grid-sizer rule.
-3. [x] Wrap masonry in inner div inside <main> — fitWidth was reading body width and stamping inline width on main, breaking max-width and forcing 4 cols.
-4. [ ] User verifies in browser: 3 cols at default viewport, centered, infinite scroll appends without reflow.
+1. [x] Masonry + imagesLoaded + InfiniteScroll outlayer integration.
+2. [x] CSS: 320px cards, .grid-sizer, mobile 100%.
+3. [x] Wrap masonry in inner <div> so fitWidth respects main's 1200px maxw.
+4. [x] Month markers: data-ym on each card; placeMarkers() runs on layoutComplete; absolute-positioned in <main>'s left gutter; year-change variant bigger; hidden ≤700px.
+5. [ ] User verifies in browser: 3 cols centered, markers in left gutter at month boundaries, year change visibly larger, append doesn't reflow.
+6. [ ] Optional follow-up: sticky/fixed-overlay current-month indicator (separate from in-page markers).
 
 # STATUS
-Live build showed (a) too wide, (b) 4 cols. Root cause: <main> was both layout box and Masonry container; with fitWidth:true Masonry sized off body width, not the 1200px maxw, and stamped an inline width onto main. Fix: inner `<div class="masonry">` so Masonry's parent is the 1180px content box. Math: 3×320 + 2×10 = 980 fits; 4 cols = 1310 doesn't. Awaiting user re-verify after Cloudflare rebuild.
+Markers ship as: lowercase 3-letter month + 4-digit year (e.g. "mar 2026"); font-weight 800; opacity 0.5; year-change at 1.5rem vs 0.95rem default. Anchored to first DOM card of each new month (DOM is desc by date, so as you scroll down, months go backwards). placeMarkers() removes-then-rebuilds on every layoutComplete — handles initial layout, post-imagesLoaded relayout, and InfiniteScroll appends.
 
 # DECISIONS
-- masonry-layout + imagesloaded + infinite-scroll@5 (Metafizzy).
-- outlayer: msnry on InfiniteScroll handles imagesLoaded + masonry.appended() automatically.
-- .grid-sizer (not fixed px) so mobile media query can swap to 100% width.
-- fitWidth: true to center the grid; requires constrained parent — hence wrapper div.
+- Masonry+imagesLoaded+InfiniteScroll@5 (Metafizzy); outlayer:msnry handles append+layout.
+- fitWidth:true requires constrained parent → wrapper div.
+- Markers absolute-positioned (incompatible with position:sticky); sticky pin would be a separate fixed overlay if requested.
+- Marker positioning in <main> (not inside .masonry) so they live in the 1180-980=~100px gutter.
 
 # WORKING SET
-- layouts/index.html:13-14, 55-56 (wrapper div), 76-104 (init script)
-- static/css/main.css:28-42 (.masonry, .grid-sizer, .card, mobile)
-- :root --gap=10px (gutter), --maxw=1200px
+- layouts/index.html:13-14, 55-56 (wrapper), 24/39/50 (data-ym attrs), 76-118 (init + placeMarkers)
+- static/css/main.css:22-27 (main position:relative), 28-42 (masonry/grid-sizer/card), 44-67 (.month-marker)
+- :root --gap=10px, --maxw=1200px
