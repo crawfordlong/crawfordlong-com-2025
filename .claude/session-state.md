@@ -22,3 +22,7 @@ Markers ship as: lowercase 3-letter month + 4-digit year (e.g. "mar 2026"); font
 - layouts/index.html:13-14, 55-56 (wrapper), 24/39/50 (data-ym attrs), 76-118 (init + placeMarkers)
 - static/css/main.css:22-27 (main position:relative), 28-42 (masonry/grid-sizer/card), 44-67 (.month-marker)
 - :root --gap=10px, --maxw=1200px
+
+## Session ended cleanly: 2026-05-05T14:40:25Z
+
+## Session ended cleanly: 2026-05-05T14:40:56Z

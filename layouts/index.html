@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 
   const placeMarkers = () => {
-    main.querySelectorAll('.month-marker').forEach(el => el.remove());
+    main.querySelectorAll('.month-marker, .year-stack').forEach(el => el.remove());
     const mainTop = main.getBoundingClientRect().top;
     let prevYM = null;
     let prevYear = null;
@@ -91,11 +91,21 @@ document.addEventListener('DOMContentLoaded', function () {
       const ym = card.dataset.ym;
       if (!ym || ym === prevYM) return;
       const [year, month] = ym.split('-');
-      const m = document.createElement('div');
-      m.className = 'month-marker' + (prevYear && year !== prevYear ? ' year-change' : '');
-      m.textContent = `${MONTHS[parseInt(month, 10) - 1]} ${year}`;
-      m.style.top = (card.getBoundingClientRect().top - mainTop) + 'px';
-      main.appendChild(m);
+      const monthLabel = `${MONTHS[parseInt(month, 10) - 1]} ${year}`;
+      const top = card.getBoundingClientRect().top - mainTop;
+      if (year !== prevYear) {
+        const stack = document.createElement('div');
+        stack.className = 'year-stack';
+        stack.style.top = top + 'px';
+        stack.innerHTML = `<div class="year-num">${year}</div><div class="month-year">${monthLabel}</div>`;
+        main.appendChild(stack);
+      } else {
+        const m = document.createElement('div');
+        m.className = 'month-marker';
+        m.textContent = monthLabel;
+        m.style.top = top + 'px';
+        main.appendChild(m);
+      }
       prevYM = ym;
       prevYear = year;
     });
