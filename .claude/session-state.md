@@ -19,3 +19,5 @@ Decision locked: keep ~320px card width, 3 cols at default `--maxw: 1200px`. Yea
 - layouts/index.html (template + init script)
 - static/css/main.css:28-37 (.masonry rules), 42-47 (.card)
 - :root --gap = 10px (used as masonry gutter)
+
+## Session ended cleanly: 2026-05-05T13:52:10Z
