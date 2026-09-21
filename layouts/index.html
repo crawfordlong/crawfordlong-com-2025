@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const ym = card.dataset.ym;
       if (!ym || ym === prevYM) return;
       const [year, month] = ym.split('-');
-      const monthLabel = `${MONTHS[parseInt(month, 10) - 1]} ${year}`;
+      const monthLabel = MONTHS[parseInt(month, 10) - 1];
       const top = card.getBoundingClientRect().top - mainTop;
       const el = document.createElement('div');
       if (year !== prevYear) {
