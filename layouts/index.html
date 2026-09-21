@@ -82,32 +82,42 @@ document.addEventListener('DOMContentLoaded', function () {
   const main = grid.parentNode;
   const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 
+  const MARKER_GAP = 6;
+
   const placeMarkers = () => {
     main.querySelectorAll('.month-marker, .year-stack').forEach(el => el.remove());
     const mainTop = main.getBoundingClientRect().top;
     let prevYM = null;
     let prevYear = null;
+    const markers = [];
     grid.querySelectorAll('.card').forEach(card => {
       const ym = card.dataset.ym;
       if (!ym || ym === prevYM) return;
       const [year, month] = ym.split('-');
       const monthLabel = `${MONTHS[parseInt(month, 10) - 1]} ${year}`;
       const top = card.getBoundingClientRect().top - mainTop;
+      const el = document.createElement('div');
       if (year !== prevYear) {
-        const stack = document.createElement('div');
-        stack.className = 'year-stack';
-        stack.style.top = top + 'px';
-        stack.innerHTML = `<div class="year-num">${year}</div><div class="month-year">${monthLabel}</div>`;
-        main.appendChild(stack);
+        el.className = 'year-stack';
+        el.innerHTML = `<div class="year-num">${year}</div><div class="month-year">${monthLabel}</div>`;
       } else {
-        const m = document.createElement('div');
-        m.className = 'month-marker';
-        m.textContent = monthLabel;
-        m.style.top = top + 'px';
-        main.appendChild(m);
+        el.className = 'month-marker';
+        el.textContent = monthLabel;
       }
+      main.appendChild(el);
+      markers.push({ el, top });
       prevYM = ym;
       prevYear = year;
+    });
+
+    // Cards sit in several columns, so consecutive months often start at the
+    // same height and their labels land on top of each other. Walk the markers
+    // in date order and push each one below the previous label.
+    let minTop = -Infinity;
+    markers.forEach(m => {
+      const top = Math.max(m.top, minTop);
+      m.el.style.top = top + 'px';
+      minTop = top + m.el.offsetHeight + MARKER_GAP;
     });
   };
 
